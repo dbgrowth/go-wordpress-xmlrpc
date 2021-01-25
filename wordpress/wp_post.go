@@ -1,6 +1,12 @@
 package wordpress
 
-type Post struct {
+type Edit struct {
+	BlogID int
+	PostID int
+	EditContent
+}
+
+type New struct {
 	BlogID int
 	PostContent
 }
@@ -22,8 +28,23 @@ type PostContent struct {
 	PostThumbnail int    `xmlrpc:"post_thumbnail"`
 	PostParent    int    `xmlrpc:"post_parent"`
 	// Terms         Terms      `xmlrpc:"terms"`
-	TermsNames TermsNames `xmlrpc:"terms_names"`
-	Enclosure  Enclosure  `xmlrpc:"enclosure"`
+	TermsNames   TermsNames     `xmlrpc:"terms_names"`
+	Enclosure    Enclosure      `xmlrpc:"enclosure"`
+	CustomFields []CustomFields `xmlrpc:"custom_fields"`
+}
+
+type EditContent struct {
+	PostTitle     string `xmlrpc:"post_title"`
+	PostContent   string `xmlrpc:"post_content"`
+	PostThumbnail int    `xmlrpc:"post_thumbnail"`
+	TermsNames   TermsNames     `xmlrpc:"terms_names"`
+	CustomFields []CustomFields `xmlrpc:"custom_fields"`
+}
+
+type CustomFields struct {
+	Id    string `xmlrpc:"id"`
+	Key   string `xmlrpc:"key"`
+	Value string `xmlrpc:"value"`
 }
 
 type Terms struct {
@@ -49,17 +70,27 @@ type Enclosure struct {
 	Type   string `xmlrpc:"type"`
 }
 
-func (p Post) GetMethord() string {
+func (p New) GetMethord() string {
 	return `wp.newPost`
 }
 
-func (p Post) GetArgs(user string, pwd string) interface{} {
+func (p Edit) GetMethord() string {
+	return `wp.editPost`
+}
+
+func (p New) GetArgs(user string, pwd string) interface{} {
 	args := make([]interface{}, 4)
 	args = append(args, p.BlogID, user, pwd, p.PostContent)
 	return args
 }
 
-func NewPost(content string, title string, tags []string, cate []string, date string) (p Post) {
+func (p Edit) GetArgs(user string, pwd string) interface{} {
+	args := make([]interface{}, 5)
+	args = append(args, p.BlogID, user, pwd, p.PostID, p.EditContent)
+	return args
+}
+
+func NewPost(content string, title string, tags []string, cate []string, date string) (p New) {
 	p.PostContent = PostContent{
 		PostType:    `post`,
 		PostStatus:  `publish`,
@@ -74,8 +105,15 @@ func NewPost(content string, title string, tags []string, cate []string, date st
 	return p
 }
 
-// NewSpecificPost Customize various values by yourself
-func NewSpecificPost(content PostContent) (p Post) {
-	p.PostContent = content
+func EditPost(postID int, content string, title string, tags []string, cate []string) (p Edit) {
+	p.PostID = postID
+	p.EditContent = EditContent{
+		PostTitle:   title,
+		PostContent: content,
+		TermsNames: TermsNames{
+			PostCategory: cate,
+			TagsInput:    tags,
+		},
+	}
 	return p
 }
