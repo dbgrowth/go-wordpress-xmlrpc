@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/abcdsxg/go-wordpress-xmlrpc/wordpress"
+	"github.com/dbgrowth/go-wordpress-xmlrpc/wordpress"
 	"github.com/kolo/xmlrpc"
 )
 
