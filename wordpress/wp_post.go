@@ -34,15 +34,13 @@ type PostContent struct {
 }
 
 type EditContent struct {
-	PostTitle     string `xmlrpc:"post_title"`
-	PostContent   string `xmlrpc:"post_content"`
-	PostThumbnail int    `xmlrpc:"post_thumbnail"`
-	TermsNames   TermsNames     `xmlrpc:"terms_names"`
-	CustomFields []CustomFields `xmlrpc:"custom_fields"`
+	PostTitle     string     `xmlrpc:"post_title"`
+	PostContent   string     `xmlrpc:"post_content"`
+	PostThumbnail int        `xmlrpc:"post_thumbnail"`
+	TermsNames    TermsNames `xmlrpc:"terms_names"`
 }
 
 type CustomFields struct {
-	Id    string `xmlrpc:"id"`
 	Key   string `xmlrpc:"key"`
 	Value string `xmlrpc:"value"`
 }
@@ -90,7 +88,7 @@ func (p Edit) GetArgs(user string, pwd string) interface{} {
 	return args
 }
 
-func NewPost(content string, title string, tags []string, cate []string, date string) (p New) {
+func NewPost(content string, title string, tags []string, cate []string, date string, views string, like string) (p New) {
 	p.PostContent = PostContent{
 		PostType:    `post`,
 		PostStatus:  `publish`,
@@ -100,6 +98,10 @@ func NewPost(content string, title string, tags []string, cate []string, date st
 		TermsNames: TermsNames{
 			PostCategory: cate,
 			TagsInput:    tags,
+		},
+		CustomFields: []CustomFields{
+			{Key: "views", Value: views},
+			{Key: "bigfa_ding", Value: like},
 		},
 	}
 	return p
